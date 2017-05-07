@@ -1,9 +1,9 @@
 var TextCounter = {
-    maxChar: 10,
+    maxChar: 3,
     textArea: null,
     textAreaTotal: null,
     textAreaLeft: null,
-    init: function () {
+    init: function() {
         this.textArea = document.querySelector('#js-message');
         this.textAreaTotal = document.querySelector('#js-message-left-total');
         this.textAreaLeft = document.querySelector('#js-message-left-symbols');
@@ -11,24 +11,26 @@ var TextCounter = {
         this.events();
     },
 
-    events: function () {
+    events: function() {
         var textArea = this.textArea;
         var limit = this.maxChar;
-        var fieldLength = this.fieldLength(textArea);
+        var selfTotal = this.textAreaTotal;
+        var selfLeft = this.textAreaLeft;
 
-        this.textAreaTotal.innerHTML = fieldLength;
-        this.textAreaLeft.innerHTML = limit - fieldLength;
+        textArea.addEventListener('keyup', function (e) {
+            var textAreaLength = textArea.value.length;
 
-        // textArea.addEventListener('keypress', this.checkLength(textArea, limit, this));
-        textArea.addEventListener('keypress', function (event) {
-            console.log(fieldLength);
-            if (fieldLength >= limit) {
-                event.preventDefault();
+            selfTotal.innerHTML = textAreaLength;
+            selfLeft.innerHTML = limit - textAreaLength;
+
+            if (textAreaLength >= limit) {
+                console.log('STOP!!!!');
+                e.preventDefault(); //preventDefault doesn't work for keyup event, only keypress or keydown;
             }
-        });
-    },
-
-    fieldLength: function (elem) {
-        return elem.value.length;
+        })
     }
 };
+
+document.addEventListener("DOMContentLoaded", function () {
+    TextCounter.init();
+});

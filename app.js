@@ -1,5 +1,5 @@
 var TextCounter = {
-    maxChar: 3,
+    maxChar: 140,
     textArea: null,
     textAreaTotal: null,
     textAreaLeft: null,
@@ -17,17 +17,20 @@ var TextCounter = {
         var selfTotal = this.textAreaTotal;
         var selfLeft = this.textAreaLeft;
 
-        textArea.addEventListener('keyup', function (e) {
+        textArea.addEventListener('keyup', function () {
             var textAreaLength = textArea.value.length;
-
-            selfTotal.innerHTML = textAreaLength;
-            selfLeft.innerHTML = limit - textAreaLength;
-
             if (textAreaLength >= limit) {
-                console.log('STOP!!!!');
-                e.preventDefault(); //preventDefault doesn't work for keyup event, only keypress or keydown;
+                // e.preventDefault(); //preventDefault doesn't work for keyup event, only keypress or keydown;
+                textArea.value = textArea.value.substring(0, limit);
             }
-        })
+
+            var textAreaLengthNew = textArea.value.length; // this variable needed for print current length
+            selfTotal.innerHTML = textAreaLengthNew;
+            selfLeft.innerHTML = limit - textAreaLengthNew;
+        });
+
+        // another easy way =)
+        textArea.setAttribute('maxLength', limit);
     }
 };
 

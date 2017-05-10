@@ -3,14 +3,14 @@ var TextCounter = {
     textArea: null,
     textAreaTotal: null,
     textAreaLeft: null,
-    init: function() {
-        this.textArea = document.querySelector('#js-message');
-        this.textAreaTotal = document.querySelector('#js-message-left-total');
-        this.textAreaLeft = document.querySelector('#js-message-left-symbols');
+    init: function(textArea, total, left) {
+        this.textArea = document.querySelector(textArea);
+        this.textAreaTotal = document.querySelector(total);
+        this.textAreaLeft = document.querySelector(left);
 
         this.events();
         this.setMaxLength();
-},
+    },
 
     events: function() {
         this.textArea.addEventListener('keyup', this.textLimiter.bind(this));
@@ -32,11 +32,11 @@ var TextCounter = {
         this.textAreaLeft.innerHTML = this.maxChar - this.textAreaLength();
     },
 
-    setMaxLength: function () {
-        this.textArea.setAttribute('maxLength', this.maxChar);
+    setMaxLength: function (textField) {
+        textField.setAttribute('maxLength', this.maxChar);
     }
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-    TextCounter.init();
+    TextCounter.init('#js-message', '#js-message-left-total', '#js-message-left-symbols');
 });

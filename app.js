@@ -4,9 +4,9 @@ function TextCounter(textField, maxChar, total, left) {
     this.textAreaTotal = total;
     this.textAreaLeft = left;
 
-    this.init = function(textArea, total, left) {
+    this.init = function() {
         try {
-            this.textArea = document.querySelector(textArea);
+            this.textArea = document.querySelector(textField);
             this.textAreaTotal = document.querySelector(total);
             this.textAreaLeft = document.querySelector(left);
 
@@ -40,11 +40,11 @@ function TextCounter(textField, maxChar, total, left) {
     this.setMaxLength = function () {
         this.textArea.setAttribute('maxLength', this.maxChar);
     };
+
+    this.init();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     var textArea1 = new TextCounter('#js-message', 140, '#js-message-left-total', '#js-message-left-symbols');
     var textArea2 = new TextCounter('#js-message2', 10, '#js-message-left-total2', '#js-message-left-symbols2');
-    textArea1.init('#js-message', '#js-message-left-total', '#js-message-left-symbols');
-    textArea2.init('#js-message2', '#js-message-left-total2', '#js-message-left-symbols2');
 });

@@ -12,7 +12,7 @@ var TextCounter = {
             this.events();
             this.setMaxLength();
         } catch (error) {
-            alert('Please, check your selectors' + error);
+            throw new Error('Please, check your selectors; ' + error);
         }
     },
 
@@ -42,5 +42,5 @@ var TextCounter = {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-    TextCounter.init('#js-message', '#js-message-left-total', '#js-message-left-symbols');
+    TextCounter.init('#js-message1', '#js-message-left-total', '#js-message-left-symbols');
 });

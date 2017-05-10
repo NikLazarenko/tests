@@ -13,24 +13,20 @@ var TextCounter = {
 },
 
     events: function() {
-        this.textCounter();
+        this.textArea.addEventListener('keyup', this.textLimiter.bind(this));
     },
 
-    textCounter: function () {
-        var textLimiter = function () {
-            var textAreaLength = this.textArea.value.length;
-            var limit = this.maxChar;
+    textLimiter: function () {
+        var textAreaLength = this.textArea.value.length;
+        var limit = this.maxChar;
 
-            if (textAreaLength >= limit) {
-                this.textArea.value = this.textArea.value.substring(0, limit);
-            }
+        if (textAreaLength >= limit) {
+            this.textArea.value = this.textArea.value.substring(0, limit);
+        }
 
-            var textAreaLengthCurrent = this.textArea.value.length; // This variable is required to display the current length
-            this.textAreaTotal.innerHTML = textAreaLengthCurrent;
-            this.textAreaLeft.innerHTML = limit - textAreaLengthCurrent;
-        };
-
-        this.textArea.addEventListener('keyup', textLimiter.bind(this));
+        var textAreaLengthCurrent = this.textArea.value.length; // This variable is required to display the current length
+        this.textAreaTotal.innerHTML = textAreaLengthCurrent;
+        this.textAreaLeft.innerHTML = limit - textAreaLengthCurrent;
     },
 
     setMaxLength: function () {

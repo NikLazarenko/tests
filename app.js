@@ -4,12 +4,16 @@ var TextCounter = {
     textAreaTotal: null,
     textAreaLeft: null,
     init: function(textArea, total, left) {
-        this.textArea = document.querySelector(textArea);
-        this.textAreaTotal = document.querySelector(total);
-        this.textAreaLeft = document.querySelector(left);
+        try {
+            this.textArea = document.querySelector(textArea);
+            this.textAreaTotal = document.querySelector(total);
+            this.textAreaLeft = document.querySelector(left);
 
-        this.events();
-        this.setMaxLength();
+            this.events();
+            this.setMaxLength();
+        } catch (error) {
+            alert('Please, check your selectors' + error);
+        }
     },
 
     events: function() {
@@ -32,8 +36,8 @@ var TextCounter = {
         this.textAreaLeft.innerHTML = this.maxChar - this.textAreaLength();
     },
 
-    setMaxLength: function (textField) {
-        textField.setAttribute('maxLength', this.maxChar);
+    setMaxLength: function () {
+        this.textArea.setAttribute('maxLength', this.maxChar);
     }
 };
 

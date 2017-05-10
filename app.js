@@ -17,16 +17,19 @@ var TextCounter = {
     },
 
     textLimiter: function () {
-        var textAreaLength = this.textArea.value.length;
-        var limit = this.maxChar;
-
-        if (textAreaLength >= limit) {
-            this.textArea.value = this.textArea.value.substring(0, limit);
+        if (this.textAreaLength() >= this.maxChar) {
+            this.textArea.value = this.textArea.value.substring(0, this.maxChar);
         }
+        this.displayLengthCalc();
+    },
 
-        var textAreaLengthCurrent = this.textArea.value.length; // This variable is required to display the current length
-        this.textAreaTotal.innerHTML = textAreaLengthCurrent;
-        this.textAreaLeft.innerHTML = limit - textAreaLengthCurrent;
+    textAreaLength: function () {
+        return this.textArea.value.length;
+    },
+
+    displayLengthCalc: function () {
+        this.textAreaTotal.innerHTML = this.textAreaLength();
+        this.textAreaLeft.innerHTML = this.maxChar - this.textAreaLength();
     },
 
     setMaxLength: function () {

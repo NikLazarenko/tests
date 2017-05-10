@@ -9,28 +9,32 @@ var TextCounter = {
         this.textAreaLeft = document.querySelector('#js-message-left-symbols');
 
         this.events();
-    },
+        this.setMaxLength();
+},
 
     events: function() {
-        var textArea = this.textArea;
-        var limit = this.maxChar;
-        var selfTotal = this.textAreaTotal;
-        var selfLeft = this.textAreaLeft;
+        this.textCounter();
+    },
 
-        textArea.addEventListener('keyup', function () {
-            var textAreaLength = textArea.value.length;
+    textCounter: function () {
+        var textLimiter = function () {
+            var textAreaLength = this.textArea.value.length;
+            var limit = this.maxChar;
+
             if (textAreaLength >= limit) {
-                // e.preventDefault(); //preventDefault doesn't work for keyup event, only keypress or keydown;
-                textArea.value = textArea.value.substring(0, limit);
+                this.textArea.value = this.textArea.value.substring(0, limit);
             }
 
-            var textAreaLengthNew = textArea.value.length; // this variable needed for print current length
-            selfTotal.innerHTML = textAreaLengthNew;
-            selfLeft.innerHTML = limit - textAreaLengthNew;
-        });
+            var textAreaLengthCurrent = this.textArea.value.length; // This variable is required to display the current length
+            this.textAreaTotal.innerHTML = textAreaLengthCurrent;
+            this.textAreaLeft.innerHTML = limit - textAreaLengthCurrent;
+        };
 
-        // another easy way =)
-        textArea.setAttribute('maxLength', limit);
+        this.textArea.addEventListener('keyup', textLimiter.bind(this));
+    },
+
+    setMaxLength: function () {
+        this.textArea.setAttribute('maxLength', this.maxChar);
     }
 };
 

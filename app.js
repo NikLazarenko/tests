@@ -4,16 +4,23 @@ function TextCounter(textField, maxChar, total, left) {
     this.textAreaTotal = document.querySelector(total);
     this.textAreaLeft = document.querySelector(left);
 
-    try {
-        this.init();
-    } catch (error) {
-        throw new Error('Please, check your selectors; ' + error);
-    }
+    this.init();
 }
 
 TextCounter.prototype.init = function() {
+    this.isExists();
     this.events();
     this.setMaxLength();
+};
+
+TextCounter.prototype.isExists = function () {
+    for (var key in this) {
+        if (Object.prototype.hasOwnProperty.call(this, key)) {
+            if (this[key] === null) {
+                throw new Error('Incorrect selector detected. Please check your ' + key + ' selector');
+            }
+        }
+    }
 };
 
 TextCounter.prototype.events = function() {
@@ -42,5 +49,5 @@ TextCounter.prototype.setMaxLength = function () {
 
 document.addEventListener("DOMContentLoaded", function () {
     var textArea1 = new TextCounter('#js-message', 140, '#js-message-left-total', '#js-message-left-symbols');
-    var textArea2 = new TextCounter('#js-message2', 10, '#js-message-left-total2', '#js-message-left-symbols2');
+    var textArea2 = new TextCounter('#incorrectSelector', 10, '#js-message-left-total2', '#js-message-left-symbols2');
 });

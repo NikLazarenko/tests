@@ -1,20 +1,20 @@
 function TextCounter(textField, maxChar, total, left) {
     this.maxChar = maxChar;
+    this.textArea = document.querySelector(textField);
+    this.textAreaTotal = document.querySelector(total);
+    this.textAreaLeft = document.querySelector(left);
 
-    TextCounter.prototype.init = function() {
-        try {
-            this.textArea = document.querySelector(textField);
-            this.textAreaTotal = document.querySelector(total);
-            this.textAreaLeft = document.querySelector(left);
-
-            this.events();
-            this.setMaxLength();
-        } catch (error) {
-            throw new Error('Please, check your selectors; ' + error);
-        }
-    };
     this.init();
 }
+
+TextCounter.prototype.init = function() {
+    try {
+        this.events();
+        this.setMaxLength();
+    } catch (error) {
+        throw new Error('Please, check your selectors; ' + error);
+    }
+};
 
 TextCounter.prototype.events = function() {
     this.textArea.addEventListener('keyup', this.textLimiter.bind(this));

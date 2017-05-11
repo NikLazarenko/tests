@@ -1,10 +1,7 @@
 function TextCounter(textField, maxChar, total, left) {
-    this.textArea = textField;
     this.maxChar = maxChar;
-    this.textAreaTotal = total;
-    this.textAreaLeft = left;
 
-    this.init = function() {
+    TextCounter.prototype.init = function() {
         try {
             this.textArea = document.querySelector(textField);
             this.textAreaTotal = document.querySelector(total);
@@ -17,27 +14,27 @@ function TextCounter(textField, maxChar, total, left) {
         }
     };
 
-    this.events = function() {
+    TextCounter.prototype.events = function() {
         this.textArea.addEventListener('keyup', this.textLimiter.bind(this));
     };
 
-    this.textLimiter = function () {
+    TextCounter.prototype.textLimiter = function () {
         if (this.textAreaLength() >= this.maxChar) {
             this.textArea.value = this.textArea.value.substring(0, this.maxChar);
         }
         this.displayLengthCalc();
     };
 
-    this.textAreaLength = function () {
+    TextCounter.prototype.textAreaLength = function () {
         return this.textArea.value.length;
     };
 
-    this.displayLengthCalc = function () {
+    TextCounter.prototype.displayLengthCalc = function () {
         this.textAreaTotal.innerHTML = this.textAreaLength();
         this.textAreaLeft.innerHTML = this.maxChar - this.textAreaLength();
     };
 
-    this.setMaxLength = function () {
+    TextCounter.prototype.setMaxLength = function () {
         this.textArea.setAttribute('maxLength', this.maxChar);
     };
 

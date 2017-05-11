@@ -4,16 +4,16 @@ function TextCounter(textField, maxChar, total, left) {
     this.textAreaTotal = document.querySelector(total);
     this.textAreaLeft = document.querySelector(left);
 
-    this.init();
-}
-
-TextCounter.prototype.init = function() {
     try {
-        this.events();
-        this.setMaxLength();
+        this.init();
     } catch (error) {
         throw new Error('Please, check your selectors; ' + error);
     }
+}
+
+TextCounter.prototype.init = function() {
+    this.events();
+    this.setMaxLength();
 };
 
 TextCounter.prototype.events = function() {

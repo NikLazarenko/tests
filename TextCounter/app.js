@@ -49,5 +49,5 @@ TextCounter.prototype.setMaxLength = function () {
 
 document.addEventListener("DOMContentLoaded", function () {
     var textArea1 = new TextCounter('#js-message', 140, '#js-message-left-total', '#js-message-left-symbols');
-    var textArea2 = new TextCounter('#incorrectSelector', 10, '#js-message-left-total2', '#js-message-left-symbols2');
+    var textArea2 = new TextCounter('#js-message2', 10, '#js-message-left-total2', '#js-message-left-symbols2');
 });

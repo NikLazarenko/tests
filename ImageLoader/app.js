@@ -8,41 +8,35 @@ var Loader = (function() {
             this.loaderPercent = document.getElementById('loaderPercent');
             this.images = document.getElementsByTagName('img');
             /* add additional properties below if needed */
+            this.loadedImages = 0;
 
             this.events();
         },
 
         events: function() {
             // your events should be described within this method
-
-            var loadedImages = 0;
             for (var i = 0; i < this.images.length; i++) {
                 this.images[i].addEventListener('error', function () {
                     throw new Error('Some images was not loaded. Please, check references')
                 });
-                this.images[i].onload = function() {
-                    loadedImages++;
-                    this.loadImage(loadedImages);
-                }.bind(this);
+                this.images[i].addEventListener('load', this.loadImage.bind(this));
             }
         },
 
-        loadImage: function(loadedImages) {
+        loadImage: function() {
             // call this function on image load or error event
-            var imgCnt = this.images.length;
-            this.increaseProgressBar(loadedImages, imgCnt);
+            this.loadedImages++;
+            this.increaseProgressBar();
 
-            console.log((100 * loadedImages / imgCnt) + '% loaded');
-
-            if (loadedImages === imgCnt) {
+            if (this.loadedImages === this.images.length) {
                 this.loadedCallback();
             }
         },
 
-        increaseProgressBar: function(loadedImages, imgCnt) {
+        increaseProgressBar: function() {
             // use this method to increase progress bar percentage and color filling
-            this.progressBar.style.width = (100 * loadedImages / imgCnt + '%');
-            this.loaderPercent.innerHTML = Math.floor(100 * loadedImages / imgCnt) + '%';
+            this.progressBar.style.width = (100 * this.loadedImages / this.images.length + '%');
+            this.loaderPercent.innerHTML = Math.floor(100 * this.loadedImages / this.images.length) + '%';
         },
 
         loadedCallback: function() {

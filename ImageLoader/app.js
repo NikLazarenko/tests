@@ -17,8 +17,10 @@ var Loader = (function() {
             // your events should be described within this method
             for (var i = 0; i < this.images.length; i++) {
                 this.images[i].addEventListener('error', function () {
-                    throw new Error('Some images was not loaded. Please, check references')
-                });
+                    this.loadImage();
+                    throw new Error('Some images was not loaded. Please, check references');
+
+                }.bind(this));
                 this.images[i].addEventListener('load', this.loadImage.bind(this));
             }
         },

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Table Editor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Table Editor</h1>
+
+        <div id="table-editor1">
+            <form>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="filter-name">Filter by name</label>
+                            <input type="text" class="form-control" id="filter-name">
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <table id="table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>
+                            id
+                            <a href="#" class="sort-arrow">
+                                <i class="glyphicon glyphicon-arrow-down"></i>
+                            </a>
+                        </th>
+                        <th>
+                            Name
+                            <a href="#" class="sort-arrow">
+                                <i class="glyphicon glyphicon-arrow-down"></i>
+                            </a>
+                        </th>
+                        <th>
+                            Qty
+                            <a href="#" class="sort-arrow">
+                                <i class="glyphicon glyphicon-arrow-down"></i>
+                            </a>
+                        </th>
+                        <th>Availability</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody class="table-body"></tbody>
+            </table>
+
+            <button type="button" class="btn btn-default btn-show-add-form">Add new row</button>
+            <button type="button" class="btn btn-danger">Delete row</button>
+            <button type="button" class="btn btn-success">Demo data</button>
+            <button type="button" class="btn btn-primary">Clear table</button>
+            <button type="button" class="btn btn-warning">Export table</button>
+
+            <form class="hidden add-row-form">
+                <h2>Add new row</h2>
+                <div class="form-group">
+                    <label for="table-editor-name">Name</label>
+                    <input type="text" class="form-control table-editor-name" id="table-editor-name">
+                </div>
+                <div class="form-group">
+                    <label for="table-editor-qty">Qty</label>
+                    <select id="table-editor-qty" class="form-control table-editor-qty">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                    </select>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input class="availability-checkbox" type="checkbox"> Availability
+                    </label>
+                </div>
+                <button type="button" class="btn btn-primary add-row-btn">Add row</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

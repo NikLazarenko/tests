@@ -19,7 +19,6 @@ var Loader = (function() {
                 this.images[i].addEventListener('error', function () {
                     this.loadImage();
                     throw new Error('Some images was not loaded. Please, check references');
-
                 }.bind(this));
                 this.images[i].addEventListener('load', this.loadImage.bind(this));
             }

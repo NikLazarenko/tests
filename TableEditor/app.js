@@ -7,6 +7,8 @@ function TableEditor(container) {
     this.demoDataBtn = this.tableEditorContainer.querySelectorAll('.btn-demo-data');
     this.addRowForm = this.tableEditorContainer.querySelectorAll('.add-row-form');
     this.insertRowBtn = this.tableEditorContainer.querySelectorAll('.add-row-btn');
+    this.deleteRowBtn = this.tableEditorContainer.querySelectorAll('.btn-delete-row');
+    this.clearTableBtn = this.tableEditorContainer.querySelectorAll('.btn-clear-table');
     this.nameField = this.tableEditorContainer.querySelector('.table-editor-name');
     this.qtyField = this.tableEditorContainer.querySelector('.table-editor-qty');
     this.availability = this.tableEditorContainer.querySelector('.availability-checkbox');
@@ -29,6 +31,14 @@ TableEditor.prototype.events = function () {
     for (var i = 0; i < this.demoDataBtn.length; i++) {
         this.demoDataBtn[i].addEventListener('click', this.generateRandomData.bind(this));
     }
+
+    for (var i = 0; i < this.deleteRowBtn.length; i++) {
+        this.deleteRowBtn[i].addEventListener('click', this.deleteRows.bind(this));
+    }
+
+    for (var i = 0; i < this.clearTableBtn.length; i++) {
+        this.clearTableBtn[i].addEventListener('click', this.clearTable.bind(this));
+    }
 };
 
 TableEditor.prototype.show = function () {
@@ -36,19 +46,18 @@ TableEditor.prototype.show = function () {
 };
 
 TableEditor.prototype.drawRow = function (name, qty, availability) {
-    var newRow = this.table.rows[0].cloneNode(true);
-
-    newRow.cells[0].innerHTML = this.table.rows.length;
-    newRow.cells[1].innerHTML = name;
-    newRow.cells[2].innerHTML = qty;
-    newRow.cells[3].innerHTML = availability;
-    newRow.cells[4].innerHTML = "<input type='checkbox'>";
-    this.tableBody.appendChild(newRow);
+    this.tableBody.insertRow(-1).innerHTML =
+        '<tr>' +
+            '<td>'+ this.tableBody.rows.length + '</td>' +
+            '<td>'+ name + '</td>' +
+            '<td>'+ qty + '</td>' +
+            '<td>'+ availability + '</td>' +
+            '<td><input type="checkbox" class="delete-checkbox"></td>' +
+        '</tr>';
 };
 
 TableEditor.prototype.insertNewRow = function () {
     var avail = this.availability.checked ? "Yes" : "No";
-
     this.drawRow(this.nameField.value, this.qtyField.value, avail);
 };
 
@@ -74,6 +83,30 @@ TableEditor.prototype.getRandomStr = function () {
         resultStr += str[randomIndex];
     }
     return resultStr;
+};
+
+TableEditor.prototype.deleteRows = function () {
+    this.deleteCheckbox = this.tableBody.querySelectorAll('.delete-checkbox');
+
+    for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
+        if (this.deleteCheckbox[i].checked) {
+            this.tableBody.deleteRow(i);
+        }
+    }
+    this.updateIds();
+};
+
+TableEditor.prototype.updateIds = function () {
+    var rowCnt = this.tableBody.rows.length;
+    for (var i = 0; i < rowCnt; i++) {
+        this.tableBody.rows[i].querySelector('td').innerHTML = i + 1;
+    }
+};
+
+TableEditor.prototype.clearTable = function () {
+    for (var i = this.tableBody.rows.length - 1; i >= 0; i--) {
+        this.tableBody.deleteRow(i);
+    }
 };
 
 document.addEventListener("DOMContentLoaded", function () {

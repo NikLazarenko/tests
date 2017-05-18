@@ -54,7 +54,7 @@
             <button type="button" class="btn btn-danger btn-delete-row">Delete row</button>
             <button type="button" class="btn btn-success btn-demo-data">Demo data</button>
             <button type="button" class="btn btn-primary btn-clear-table">Clear table</button>
-            <button type="button" class="btn btn-warning">Export table</button>
+            <button type="button" class="btn btn-warning btn-export">Export table</button>
 
             <form class="hidden add-row-form">
                 <h2>Add new row</h2>
@@ -76,6 +76,14 @@
                     </label>
                 </div>
                 <button type="button" class="btn btn-primary add-row-btn">Add row</button>
+            </form>
+
+            <form class="hidden data-form">
+                <label for="data-field">Import/Export Data</label>
+                <textarea id="data-field" class="form-control data-field" rows="10"></textarea>
+                <br>
+                <button type="button" class="btn btn-success btn-import-data">Import data</button>
+                <button type="button" class="btn btn-primary btn-export-data">Export data</button>
             </form>
         </div>
     </div>

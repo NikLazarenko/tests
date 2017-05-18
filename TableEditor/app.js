@@ -22,6 +22,7 @@ TableEditor.prototype.init = function () {
     this.qtyField = this.tableEditorContainer.querySelector('.table-editor-qty');
     this.availability = this.tableEditorContainer.querySelector('.availability-checkbox');
     this.dataField = this.tableEditorContainer.querySelector('.data-field');
+    this.filterField = this.tableEditorContainer.querySelector('.filter-name');
     this.tData = [];
 
     this.events();
@@ -53,8 +54,8 @@ TableEditor.prototype.events = function () {
     }.bind(this));
 
     this.btnImportData.addEventListener('click', this.importDataToJSON.bind(this));
-
     this.btnExportData.addEventListener('click', this.exportDataFromJSON.bind(this));
+    this.filterField.addEventListener('keyup', this.filterByName.bind(this));
 };
 
 TableEditor.prototype.show = function (block) {
@@ -68,7 +69,7 @@ TableEditor.prototype.drawRow = function (data) {
             '<td>'+ newRow.name + '</td>' +
             '<td>'+ newRow.qty + '</td>' +
             '<td>'+ newRow.availability + '</td>' +
-            '<td><input type="checkbox" class="delete-checkbox"></td>' +
+            '<td><input type="checkbox" class="delete-checkbox" value="'+ newRow.id +'"></td>' +
             '</tr>';
     }.bind(this)).join('');
 };
@@ -83,6 +84,7 @@ TableEditor.prototype.insertNewRow = function () {
     };
     this.tData.push(data);
     this.drawRow(this.tData);
+    this.filterByName();
 };
 
 TableEditor.prototype.generateRandomData = function () {
@@ -97,6 +99,7 @@ TableEditor.prototype.generateRandomData = function () {
         this.tData.push(data);
     }
     this.drawRow(this.tData);
+    this.filterByName();
 };
 
 TableEditor.prototype.getRandomNum = function (min, max) {
@@ -121,10 +124,12 @@ TableEditor.prototype.deleteRows = function () {
 
     for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
         if (this.deleteCheckbox[i].checked) {
-            this.tData.splice(i, 1);
+            var checkedRowId = this.deleteCheckbox[i].value;
+            this.tData.splice(checkedRowId - 1, 1);
         }
     }
     this.updateIds();
+    this.filterByName();
 };
 
 TableEditor.prototype.updateIds = function () {
@@ -151,8 +156,18 @@ TableEditor.prototype.exportDataFromJSON = function () {
         }
         this.drawRow(this.tData);
         this.updateIds();
+        this.filterByName();
     } catch (err) {
         throw new Error('Error, please check your input JSON data ' + err);
+    }
+};
+
+TableEditor.prototype.filterByName = function () {
+    if (this.filterField.length !== 0) {
+        var result = this.tData.filter(function (arr, i) {
+            return this.tData[i].name.indexOf(this.filterField.value) + 1;
+        }.bind(this));
+        this.drawRow(result);
     }
 };
 

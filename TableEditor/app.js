@@ -90,7 +90,7 @@ TableEditor.prototype.insertNewRow = function () {
     this.tData.push(data);
     this.drawRow(this.tData);
     this.filterByName();
-    this.renderPagePagination();
+    this.renderPaginationPanel();
 };
 
 TableEditor.prototype.generateRandomData = function () {
@@ -106,7 +106,7 @@ TableEditor.prototype.generateRandomData = function () {
     }
     this.drawRow(this.tData);
     this.filterByName();
-    this.renderPagePagination();
+    this.renderPaginationPanel();
 };
 
 TableEditor.prototype.getRandomNum = function (min, max) {
@@ -135,7 +135,7 @@ TableEditor.prototype.deleteRows = function () {
         }
         this.updateIds();
         this.filterByName();
-        this.renderPagePagination();
+        this.renderPaginationPanel();
     }
 };
 
@@ -165,7 +165,7 @@ TableEditor.prototype.exportDataFromJSON = function () {
         this.drawRow(this.tData);
         this.updateIds();
         this.filterByName();
-        this.renderPagePagination();
+        this.renderPaginationPanel();
     } catch (err) {
         throw new Error('Error, please check your input JSON data ' + err);
     }
@@ -193,10 +193,6 @@ TableEditor.prototype.renderPaginationPanel = function () {
     for (var i = 1; i < this.generatePageData().length + 1; i++) {
         this.paginationPanel.innerHTML += '<li><a href="#" data-page="' + i + '">' + i + '</a></li>'
     }
-};
-
-TableEditor.prototype.renderPagePagination = function () {
-    this.renderPaginationPanel();
     this.drawRow(this.generatePageData()[0]); // show by default 1st page
     this.paginationLink[0].parentNode.classList.add('active');
 };

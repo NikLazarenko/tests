@@ -60,6 +60,7 @@ TableEditor.prototype.events = function () {
     this.btnImportData.addEventListener('click', this.importDataToJSON.bind(this));
     this.btnExportData.addEventListener('click', this.exportDataFromJSON.bind(this));
     this.filterField.addEventListener('keyup', this.filterByName.bind(this));
+    this.paginationPanel.addEventListener('click', this.paginationHandler.bind(this));
 };
 
 TableEditor.prototype.show = function (block) {
@@ -89,7 +90,7 @@ TableEditor.prototype.insertNewRow = function () {
     this.tData.push(data);
     this.drawRow(this.tData);
     this.filterByName();
-    this.renderPage();
+    this.renderPagePagination();
 };
 
 TableEditor.prototype.generateRandomData = function () {
@@ -105,7 +106,7 @@ TableEditor.prototype.generateRandomData = function () {
     }
     this.drawRow(this.tData);
     this.filterByName();
-    this.renderPage();
+    this.renderPagePagination();
 };
 
 TableEditor.prototype.getRandomNum = function (min, max) {
@@ -134,7 +135,7 @@ TableEditor.prototype.deleteRows = function () {
         }
         this.updateIds();
         this.filterByName();
-        this.renderPage();
+        this.renderPagePagination();
     }
 };
 
@@ -164,7 +165,7 @@ TableEditor.prototype.exportDataFromJSON = function () {
         this.drawRow(this.tData);
         this.updateIds();
         this.filterByName();
-        this.renderPage();
+        this.renderPagePagination();
     } catch (err) {
         throw new Error('Error, please check your input JSON data ' + err);
     }
@@ -190,30 +191,29 @@ TableEditor.prototype.generatePageData = function () {
 TableEditor.prototype.renderPaginationPanel = function () {
     this.paginationPanel.innerHTML = '';
     for (var i = 1; i < this.generatePageData().length + 1; i++) {
-        this.paginationPanel.innerHTML += '<li><a href="#">' + i + '</a></li>'
+        this.paginationPanel.innerHTML += '<li><a href="#" data-page="' + i + '">' + i + '</a></li>'
     }
 };
 
-TableEditor.prototype.renderPage = function () {
+TableEditor.prototype.renderPagePagination = function () {
     this.renderPaginationPanel();
     this.drawRow(this.generatePageData()[0]); // show by default 1st page
     this.paginationLink[0].parentNode.classList.add('active');
-    for (var i = 0; i < this.paginationLink.length; i++) {
-        (function () {
-            var k = i;
-            this.paginationLink[k].addEventListener('click', function (e) {
-                this.removeActiveClass();
-                e.preventDefault();
-                this.drawRow(this.generatePageData()[k]);
-                this.paginationLink[k].parentNode.classList.add('active');
-            }.bind(this));
-        }.bind(this)());
-    }
 };
 
 TableEditor.prototype.removeActiveClass = function () {
     for (var i = 0; i < this.paginationLink.length; i++) {
         this.paginationLink[i].parentNode.classList.remove('active');
+    }
+};
+
+TableEditor.prototype.paginationHandler = function (e) {
+    e.preventDefault();
+    var pageNumber = e.target.getAttribute('data-page');
+    if (pageNumber) {
+        this.removeActiveClass();
+        e.target.parentNode.classList.add('active');
+        this.drawRow(this.generatePageData()[pageNumber - 1]);
     }
 };
 

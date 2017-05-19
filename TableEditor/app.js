@@ -1,5 +1,7 @@
-function TableEditor(container) {
+function TableEditor(container, cntRowOnPage) {
     this.tableEditorContainer = document.getElementById(container);
+    this.pageDataLimit = cntRowOnPage || 10;
+
     this.init();
 }
 
@@ -17,6 +19,8 @@ TableEditor.prototype.init = function () {
     this.clearTableBtn = this.tableEditorContainer.querySelectorAll('.btn-clear-table');
     this.btnImportData = this.tableEditorContainer.querySelector('.btn-import-data');
     this.btnExportData = this.tableEditorContainer.querySelector('.btn-export-data');
+    this.paginationPanel = this.tableEditorContainer.querySelector('.pagination');
+    this.paginationLink = this.paginationPanel.getElementsByTagName('a');
 
     this.nameField = this.tableEditorContainer.querySelector('.table-editor-name');
     this.qtyField = this.tableEditorContainer.querySelector('.table-editor-qty');
@@ -85,6 +89,7 @@ TableEditor.prototype.insertNewRow = function () {
     this.tData.push(data);
     this.drawRow(this.tData);
     this.filterByName();
+    this.renderPage();
 };
 
 TableEditor.prototype.generateRandomData = function () {
@@ -100,6 +105,7 @@ TableEditor.prototype.generateRandomData = function () {
     }
     this.drawRow(this.tData);
     this.filterByName();
+    this.renderPage();
 };
 
 TableEditor.prototype.getRandomNum = function (min, max) {
@@ -113,23 +119,23 @@ TableEditor.prototype.getRandomStr = function () {
     var cnt = this.getRandomNum(3, 10);
     var resultStr = '';
     for (var i = 0; i < cnt; i++) {
-        var randomIndex = this.getRandomNum(0, str.length);
+        var randomIndex = this.getRandomNum(0, str.length - 1);
         resultStr += str[randomIndex];
     }
     return resultStr;
 };
 
 TableEditor.prototype.deleteRows = function () {
-    this.deleteCheckbox = this.tableBody.querySelectorAll('.delete-checkbox');
-
-    for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
-        if (this.deleteCheckbox[i].checked) {
+    this.deleteCheckbox = this.tableBody.querySelectorAll('.delete-checkbox:checked');
+    if (this.deleteCheckbox.length !== 0) {
+        for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
             var checkedRowId = this.deleteCheckbox[i].value;
             this.tData.splice(checkedRowId - 1, 1);
         }
+        this.updateIds();
+        this.filterByName();
+        this.renderPage();
     }
-    this.updateIds();
-    this.filterByName();
 };
 
 TableEditor.prototype.updateIds = function () {
@@ -142,6 +148,7 @@ TableEditor.prototype.updateIds = function () {
 TableEditor.prototype.clearTable = function () {
     this.tData = [];
     this.drawRow(this.tData);
+    this.paginationPanel.innerHTML = '';
 };
 
 TableEditor.prototype.importDataToJSON = function () {
@@ -157,6 +164,7 @@ TableEditor.prototype.exportDataFromJSON = function () {
         this.drawRow(this.tData);
         this.updateIds();
         this.filterByName();
+        this.renderPage();
     } catch (err) {
         throw new Error('Error, please check your input JSON data ' + err);
     }
@@ -168,6 +176,44 @@ TableEditor.prototype.filterByName = function () {
             return this.tData[i].name.indexOf(this.filterField.value) + 1;
         }.bind(this));
         this.drawRow(result);
+    }
+};
+
+TableEditor.prototype.generatePageData = function () {
+    var newArrData = [];
+    for (var i = 0; i < this.tData.length; i += this.pageDataLimit) {
+        newArrData.push(this.tData.slice(i, i + this.pageDataLimit));
+    }
+    return newArrData;
+};
+
+TableEditor.prototype.renderPaginationPanel = function () {
+    this.paginationPanel.innerHTML = '';
+    for (var i = 1; i < this.generatePageData().length + 1; i++) {
+        this.paginationPanel.innerHTML += '<li><a href="#">' + i + '</a></li>'
+    }
+};
+
+TableEditor.prototype.renderPage = function () {
+    this.renderPaginationPanel();
+    this.drawRow(this.generatePageData()[0]); // show by default 1st page
+    this.paginationLink[0].parentNode.classList.add('active');
+    for (var i = 0; i < this.paginationLink.length; i++) {
+        (function () {
+            var k = i;
+            this.paginationLink[k].addEventListener('click', function (e) {
+                this.removeActiveClass();
+                e.preventDefault();
+                this.drawRow(this.generatePageData()[k]);
+                this.paginationLink[k].parentNode.classList.add('active');
+            }.bind(this));
+        }.bind(this)());
+    }
+};
+
+TableEditor.prototype.removeActiveClass = function () {
+    for (var i = 0; i < this.paginationLink.length; i++) {
+        this.paginationLink[i].parentNode.classList.remove('active');
     }
 };
 

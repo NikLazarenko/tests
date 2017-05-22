@@ -30,6 +30,7 @@ TableEditor.prototype.init = function () {
     this.filterField = this.tableEditorContainer.querySelector('.filter-name');
     this.tData = [];
     this.sortedColumn = '';
+    this.currentPageNumber = 0;
 
     this.events();
 };
@@ -176,8 +177,9 @@ TableEditor.prototype.exportDataFromJSON = function () {
 
 TableEditor.prototype.filterByName = function () {
     if (this.filterField.length !== 0) {
-        var result = this.tData.filter(function (arr, i) {
-            return this.tData[i].name.indexOf(this.filterField.value) + 1;
+        var currentPageData = this.generatePageData()[this.currentPageNumber];
+        var result = currentPageData.filter(function (arr, i) {
+            return currentPageData[i].name.indexOf(this.filterField.value) + 1;
         }.bind(this));
         this.drawRow(result);
     }
@@ -214,6 +216,7 @@ TableEditor.prototype.paginationHandler = function (e) {
         e.target.parentNode.classList.add('active');
         this.drawRow(this.generatePageData()[pageNumber - 1]);
     }
+    this.currentPageNumber = pageNumber;
 };
 
 TableEditor.prototype.sorting = function (e) {

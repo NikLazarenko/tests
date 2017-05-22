@@ -21,6 +21,7 @@ TableEditor.prototype.init = function () {
     this.btnExportData = this.tableEditorContainer.querySelector('.btn-export-data');
     this.paginationPanel = this.tableEditorContainer.querySelector('.pagination');
     this.paginationLink = this.paginationPanel.getElementsByTagName('a');
+    this.tableSorting = this.table.querySelector('thead');
 
     this.nameField = this.tableEditorContainer.querySelector('.table-editor-name');
     this.qtyField = this.tableEditorContainer.querySelector('.table-editor-qty');
@@ -28,6 +29,7 @@ TableEditor.prototype.init = function () {
     this.dataField = this.tableEditorContainer.querySelector('.data-field');
     this.filterField = this.tableEditorContainer.querySelector('.filter-name');
     this.tData = [];
+    this.sortedColumn = '';
 
     this.events();
 };
@@ -61,6 +63,7 @@ TableEditor.prototype.events = function () {
     this.btnExportData.addEventListener('click', this.exportDataFromJSON.bind(this));
     this.filterField.addEventListener('keyup', this.filterByName.bind(this));
     this.paginationPanel.addEventListener('click', this.paginationHandler.bind(this));
+    this.tableSorting.addEventListener('click', this.sorting.bind(this));
 };
 
 TableEditor.prototype.show = function (block) {
@@ -210,6 +213,50 @@ TableEditor.prototype.paginationHandler = function (e) {
         this.removeActiveClass();
         e.target.parentNode.classList.add('active');
         this.drawRow(this.generatePageData()[pageNumber - 1]);
+    }
+};
+
+TableEditor.prototype.sorting = function (e) {
+    e.preventDefault();
+    var columnName = this.getSortingColumn(e);
+    if (columnName) {
+        if (this.sortedColumn === columnName) {
+            this.tData.reverse();
+            this.drawRow(this.tData);
+
+            columnName.classList.toggle('descending-sort');
+            columnName.classList.toggle('ascending-sort');
+        } else {
+            this.defaultArrowsView();
+            var columnProperty = columnName.getAttribute('data-column');
+            var compare = function (a, b) {
+                return a[columnProperty] > b[columnProperty]  ? 1 : -1;
+            };
+            this.tData.sort(compare);
+
+            columnName.classList.remove('descending-sort');
+            columnName.classList.add('ascending-sort');
+            this.sortedColumn = this.getSortingColumn(e);
+        }
+        this.drawRow(this.tData);
+        this.renderPaginationPanel();
+    }
+};
+
+TableEditor.prototype.defaultArrowsView = function () {
+    var sortingButtons = this.tableSorting.querySelectorAll('.sort-arrow');
+    for (var i = 0; i < sortingButtons.length; i++) {
+        sortingButtons[i].classList.remove('ascending-sort', 'descending-sort');
+    }
+};
+
+TableEditor.prototype.getSortingColumn = function (e) {
+    var columnType = e.target;
+    while (columnType !== this.tableSorting) {
+        if (columnType.classList.contains('sort-arrow')) {
+            return columnType;
+        }
+        columnType = columnType.parentNode;
     }
 };
 

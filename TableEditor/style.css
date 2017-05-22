@@ -2,7 +2,37 @@
     color: #000;
 }
 
+.sort-arrow.ascending-sort {
+    color: #0052fa;
+}
+
+.sort-arrow.descending-sort i {
+    color: #0052fa;
+    transform: rotate(180deg);
+}
+
 .data-form {
     display: block;
     padding-top: 50px;
+}
+
+/*So that the table does not jump*/
+.table th:nth-child(1) {
+    width: 10%;
+}
+
+.table th:nth-child(2) {
+    width: 30%;
+}
+
+.table th:nth-child(3) {
+    width: 20%;
+}
+
+.table th:nth-child(4) {
+    width: 30%;
+}
+
+.table th:nth-child(5) {
+    width: 10%;
 }

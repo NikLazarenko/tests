@@ -176,7 +176,7 @@ TableEditor.prototype.exportDataFromJSON = function () {
 };
 
 TableEditor.prototype.filterByName = function () {
-    if (this.filterField.length !== 0) {
+    if (this.filterField.length !== 0 && this.tData.length !== 0) {
         var currentPageData = this.generatePageData()[this.currentPageNumber];
         var result = currentPageData.filter(function (arr, i) {
             return currentPageData[i].name.indexOf(this.filterField.value) + 1;
@@ -199,6 +199,7 @@ TableEditor.prototype.renderPaginationPanel = function () {
         this.paginationPanel.innerHTML += '<li><a href="#" data-page="' + i + '">' + i + '</a></li>'
     }
     this.drawRow(this.generatePageData()[0]); // show by default 1st page
+    this.currentPageNumber = 0;
     this.paginationLink[0].parentNode.classList.add('active');
 };
 
@@ -216,7 +217,7 @@ TableEditor.prototype.paginationHandler = function (e) {
         e.target.parentNode.classList.add('active');
         this.drawRow(this.generatePageData()[pageNumber - 1]);
     }
-    this.currentPageNumber = pageNumber;
+    this.currentPageNumber = pageNumber - 1;
 };
 
 TableEditor.prototype.sorting = function (e) {

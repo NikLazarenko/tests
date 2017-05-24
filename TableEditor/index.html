@@ -16,30 +16,30 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label for="filter-name">Filter by name</label>
-                            <input type="text" class="form-control filter-name" id="filter-name">
+                            <input type="text" class="form-control js-filter-name" id="filter-name">
                         </div>
                     </div>
                 </div>
             </form>
 
-            <table id="table" class="table table-striped">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>
                             id
-                            <a href="#" class="sort-arrow" data-column="id">
+                            <a href="#" class="sort-arrow js-sort-arrow" data-column="id">
                                 <i class="glyphicon glyphicon-arrow-down"></i>
                             </a>
                         </th>
                         <th>
                             Name
-                            <a href="#" class="sort-arrow" data-column="name">
+                            <a href="#" class="sort-arrow js-sort-arrow" data-column="name">
                                 <i class="glyphicon glyphicon-arrow-down"></i>
                             </a>
                         </th>
                         <th>
                             Qty
-                            <a href="#" class="sort-arrow" data-column="qty">
+                            <a href="#" class="sort-arrow js-sort-arrow" data-column="qty">
                                 <i class="glyphicon glyphicon-arrow-down"></i>
                             </a>
                         </th>
@@ -47,24 +47,24 @@
                         <th>Delete</th>
                     </tr>
                 </thead>
-                <tbody class="table-body"></tbody>
+                <tbody></tbody>
             </table>
 
-            <button type="button" class="btn btn-default btn-show-add-form">Add new row</button>
-            <button type="button" class="btn btn-danger btn-delete-row">Delete row</button>
-            <button type="button" class="btn btn-success btn-demo-data">Demo data</button>
-            <button type="button" class="btn btn-primary btn-clear-table">Clear table</button>
-            <button type="button" class="btn btn-warning btn-export">Export table</button>
+            <button type="button" class="btn btn-default js-btn-show-add-form">Add new row</button>
+            <button type="button" class="btn btn-danger js-btn-delete-row">Delete row</button>
+            <button type="button" class="btn btn-success js-btn-demo-data">Demo data</button>
+            <button type="button" class="btn btn-primary js-btn-clear-table">Clear table</button>
+            <button type="button" class="btn btn-warning js-btn-export-data">Export table</button>
 
-            <form class="hidden add-row-form">
+            <form class="hidden js-add-row-form">
                 <h2>Add new row</h2>
                 <div class="form-group">
                     <label for="table-editor-name">Name</label>
-                    <input type="text" class="form-control table-editor-name" id="table-editor-name">
+                    <input type="text" class="form-control js-table-editor-name" id="table-editor-name">
                 </div>
                 <div class="form-group">
                     <label for="table-editor-qty">Qty</label>
-                    <select id="table-editor-qty" class="form-control table-editor-qty">
+                    <select id="table-editor-qty" class="form-control js-table-editor-qty">
                         <option>1</option>
                         <option>2</option>
                         <option>3</option>
@@ -72,22 +72,22 @@
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input class="availability-checkbox" type="checkbox"> Availability
+                        <input class="js-availability-checkbox" type="checkbox"> Availability
                     </label>
                 </div>
-                <button type="button" class="btn btn-primary add-row-btn">Add row</button>
+                <button type="button" class="btn btn-primary js-add-row-btn">Add row</button>
             </form>
 
-            <form class="hidden data-form">
-                <label for="data-field">Import/Export Data</label>
-                <textarea id="data-field" class="form-control data-field" rows="10"></textarea>
+            <form class="hidden data-form js-data-form">
+                <label for="data-field">Import Data</label>
+                <textarea id="data-field" class="form-control js-data-field" rows="10"></textarea>
                 <br>
-                <button type="button" class="btn btn-success btn-import-data">Import data</button>
-                <button type="button" class="btn btn-primary btn-export-data">Export data</button>
+                <button type="button" class="btn btn-success js-btn-import-data">Import data</button>
+                <!--<button type="button" class="btn btn-primary js-btn-export-data">Export data</button>-->
             </form>
 
             <div>
-                <ul class="pagination"></ul>
+                <ul class="pagination js-pagination"></ul>
             </div>
 
         </div>

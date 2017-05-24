@@ -36,3 +36,12 @@
 .table th:nth-child(5) {
     width: 10%;
 }
+
+.table {
+    position: relative;
+}
+
+.table tr {
+    left: 0;
+    width: 100%;
+}

@@ -35,9 +35,7 @@ TableEditor.prototype.events = function () {
         this.insertNewRow();
     }.bind(this));
 
-    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', function () {
-        this.generateRandomData();
-    }.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', this.generateRandomData.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-clear-table', this.clearTable.bind(this));
@@ -55,6 +53,12 @@ TableEditor.prototype.events = function () {
 
     this.paginationPanel.addEventListener('click', this.paginationHandler.bind(this));
     this.tableSorting.addEventListener('click', this.sorting.bind(this));
+
+    this.tableBody.addEventListener('input', function () {
+        this.editableContent(event);
+    }.bind(this));
+
+    this.addEvent(this.tableEditorContainer, 'keypress', 'js-num-validation', this.validateNumbers.bind(this));
 };
 
 TableEditor.prototype.toggleNodeVisibility = function (node) {
@@ -63,14 +67,26 @@ TableEditor.prototype.toggleNodeVisibility = function (node) {
 
 TableEditor.prototype.drawRow = function (data) {
     this.tableBody.innerHTML = data.map(function (newRow) {
-        return '<tr>' +
-            '<td>'+ newRow.id + '</td>' +
-            '<td>'+ newRow.name + '</td>' +
-            '<td>'+ newRow.qty + '</td>' +
+        return '<tr data-id="'+ newRow.id +'">' +
+            '<td class="js-row-id">'+ newRow.id + '</td>' +
+            '<td contenteditable="true" data-prop="name">'+ newRow.name + '</td>' +
+            '<td contenteditable="true" data-prop="qty" class="js-num-validation">'+ newRow.qty + '</td>' +
             '<td>'+ newRow.availability + '</td>' +
             '<td><input type="checkbox" class="delete-checkbox" value="'+ newRow.id +'"></td>' +
             '</tr>';
     }.bind(this)).join('');
+};
+
+TableEditor.prototype.editableContent = function () {
+    var target = event.target;
+    var editableRow = target.parentNode.getAttribute('data-id');
+    this.tData[editableRow - 1][target.getAttribute('data-prop')] = target.innerHTML;
+};
+
+TableEditor.prototype.validateNumbers = function () {
+    if (!(event.charCode >= 48 && event.charCode <= 57)) {
+        event.preventDefault();
+    }
 };
 
 TableEditor.prototype.insertNewRow = function () {

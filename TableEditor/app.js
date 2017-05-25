@@ -30,8 +30,14 @@ TableEditor.prototype.events = function () {
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-show-add-form', function () {
         this.toggleNodeVisibility(this.addRowForm);
     }.bind(this));
-    this.addEvent(this.tableEditorContainer, 'click', 'js-add-row-btn', this.insertNewRow.bind(this));
-    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', this.generateRandomData.bind(this));
+    this.tableEditorContainer.querySelector('.js-add-row-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        this.insertNewRow();
+    }.bind(this));
+
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', function () {
+        this.generateRandomData();
+    }.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-clear-table', this.clearTable.bind(this));
@@ -42,6 +48,11 @@ TableEditor.prototype.events = function () {
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-import-data', this.importDataFromJSON.bind(this));
 
     this.filterField.addEventListener('keyup', this.filterByName.bind(this));
+
+    this.filterField.addEventListener('keypress', function (e) {
+        this.disableSubmitting(e);
+    }.bind(this));
+
     this.paginationPanel.addEventListener('click', this.paginationHandler.bind(this));
     this.tableSorting.addEventListener('click', this.sorting.bind(this));
 };
@@ -74,6 +85,7 @@ TableEditor.prototype.insertNewRow = function () {
     this.drawRow(this.tData);
     this.filterByName();
     this.renderPaginationPanel();
+    this.saveSorting();
 };
 
 TableEditor.prototype.generateRandomData = function () {
@@ -90,6 +102,7 @@ TableEditor.prototype.generateRandomData = function () {
     this.drawRow(this.tData);
     this.filterByName();
     this.renderPaginationPanel();
+    this.saveSorting();
 };
 
 TableEditor.prototype.getRandomNum = function (min, max) {
@@ -119,6 +132,7 @@ TableEditor.prototype.deleteRows = function () {
         this.updateIds();
         this.filterByName();
         this.renderPaginationPanel();
+        this.saveSorting();
     }
 };
 
@@ -149,6 +163,7 @@ TableEditor.prototype.importDataFromJSON = function () {
         this.updateIds();
         this.filterByName();
         this.renderPaginationPanel();
+        this.saveSorting();
     } catch (err) {
         throw new Error('Error, please check your input JSON data ' + err);
     }
@@ -203,27 +218,49 @@ TableEditor.prototype.sorting = function (e) {
     e.preventDefault();
     var columnName = this.getSortingColumn(e);
     if (columnName) {
-        if (this.sortedColumn === columnName) {
-            this.tData.reverse();
-            this.drawRow(this.tData);
+        var columnProperty = columnName.getAttribute('data-column');
+        if (columnName.classList.contains('ascending-sort')) {
+            this.sortItemsDescending(columnProperty);
 
-            columnName.classList.toggle('descending-sort');
-            columnName.classList.toggle('ascending-sort');
+            columnName.classList.add('descending-sort');
+            columnName.classList.remove('ascending-sort');
         } else {
             this.defaultArrowsView();
-            var columnProperty = columnName.getAttribute('data-column');
-            var compare = function (a, b) {
-                return a[columnProperty] > b[columnProperty]  ? 1 : -1;
-            };
-            this.tData.sort(compare);
+            this.sortItemsAscending(columnProperty);
 
-            columnName.classList.remove('descending-sort');
             columnName.classList.add('ascending-sort');
             this.sortedColumn = this.getSortingColumn(e);
         }
         this.drawRow(this.tData);
         this.renderPaginationPanel();
     }
+};
+
+TableEditor.prototype.sortItemsAscending = function (columnProp) {
+    var compare = function (a, b) {
+        return a[columnProp] > b[columnProp]  ? 1 : -1;
+    };
+    this.tData = this.tData.sort(compare);
+};
+
+TableEditor.prototype.sortItemsDescending = function (columnProp) {
+    var compare = function (a, b) {
+        return a[columnProp] < b[columnProp]  ? 1 : -1;
+    };
+    this.tData = this.tData.sort(compare);
+};
+
+TableEditor.prototype.saveSorting = function () {
+    if (this.sortedColumn.length !== 0) {
+        var sortedColumn = this.sortedColumn.getAttribute('data-column');
+        if (this.sortedColumn.classList.contains('ascending-sort')) {
+            this.sortItemsAscending(sortedColumn);
+        } else {
+            this.sortItemsDescending(sortedColumn);
+        }
+        this.drawRow(this.tData);
+    }
+    this.renderPaginationPanel();
 };
 
 TableEditor.prototype.defaultArrowsView = function () {
@@ -261,6 +298,14 @@ TableEditor.prototype.addEvent = function (parentNode, listener, selector, metho
     }.bind(this);
 
     parentNode.addEventListener(listener, func);
+};
+
+TableEditor.prototype.disableSubmitting = function (e) {
+    var code = e.keyCode || e.which;
+    if (code === 13) {
+        e.preventDefault();
+        return false;
+    }
 };
 
 document.addEventListener("DOMContentLoaded", function () {

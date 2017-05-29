@@ -31,7 +31,9 @@ TableEditor.prototype.init = function () {
     this.tData = [];
     this.sortedColumn = '';
     this.currentPageNumber = 0;
-    this.dragObject = {};
+    this.dragObject = '';
+    this.helperDrag = '';
+    this.dragTo = '';
 
     this.events();
 };
@@ -69,14 +71,14 @@ TableEditor.prototype.events = function () {
 
     this.tableBody.addEventListener('mousedown', function (e) {
         this.dragAndDrop(e);
-        this.tableBody.addEventListener('mousemove', function (e) {
-            this.movingBlock(e);
-        }.bind(this));
+
     }.bind(this));
 
-    // this.tableBody.addEventListener('mouseup', function (e) {
-    //     this.dragObject = '';
-    // }.bind(this));
+    this.tableBody.addEventListener('mousemove', function (e) {
+        this.dragAndDropMoving(e);
+    }.bind(this));
+
+    this.tableBody.addEventListener('mouseup', this.dragAndDropFinish.bind(this));
 };
 
 TableEditor.prototype.show = function (block) {
@@ -282,19 +284,49 @@ TableEditor.prototype.dragAndDrop = function (e) {
     }
 
     this.dragObject = this.getDraggedRow(e);
-    // this.dragObject.downX = e.pageX;
-    // this.dragObject.downY = e.pageY;
-
-    console.log('targeted ' + this.dragObject);
-    this.dragObject.style.position = 'absolute';
-    this.dragObject.style.zIndex  = '1111';
-    //this.dragObject.style.top = this.movingBlock(e);
+    this.dragObject.downX = e.pageX;
+    this.dragObject.downY = e.pageY;
 };
 
-TableEditor.prototype.movingBlock = function (e) {
-    // var row = this.getDraggedRow(e);
-    this.dragObject.style.top = e.pageY + 'px';
-    //e.pageY - 20 + 'px';
+TableEditor.prototype.dragHoverHandler = function () {
+    var rows = this.dragObject.parentNode.childNodes;
+    for (var i = 0; i < rows.length; i++) {
+        rows[i].style.backgroundColor = '';
+    }
+};
+
+TableEditor.prototype.dragAndDropMoving = function (e) {
+    if (!this.dragObject) return;
+
+    var moveY = e.pageY - this.dragObject.downY;
+
+    if (Math.abs(moveY) > 3) {
+        this.dragObject.style.position = 'absolute';
+        this.dragObject.style.pointerEvents  = 'none';
+        this.dragObject.style.opacity  = .5;
+
+        var offset = this.tableBody.getBoundingClientRect().top;
+        this.dragObject.style.top = e.pageY - offset + 'px';
+        var draggedRow = this.getDraggedRow(e);
+        if (this.dragTo !== draggedRow) {
+            this.dragHoverHandler();
+        }
+        this.dragTo = draggedRow;
+        this.dragTo.style.backgroundColor = '#a6a6a6';
+    }
+};
+
+TableEditor.prototype.dragAndDropFinish = function () {
+    if (this.dragTo.length !== 0) {
+        this.dragObject.style.top = this.dragObject.downY;
+        this.dragObject.style.position = 'relative';
+        this.dragObject.style.pointerEvents = 'auto';
+        this.dragObject.style.opacity  = 1;
+        this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo);
+    }
+    this.dragHoverHandler();
+    this.dragObject = '';
+    this.dragTo = '';
 };
 
 TableEditor.prototype.getDraggedRow = function (e) {

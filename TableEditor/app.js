@@ -37,9 +37,7 @@ TableEditor.prototype.events = function () {
         this.insertNewRow();
     }.bind(this));
 
-    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', function () {
-        this.generateRandomData();
-    }.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', this.generateRandomData.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-clear-table', this.clearTable.bind(this));
@@ -60,7 +58,6 @@ TableEditor.prototype.events = function () {
 
     this.tableBody.addEventListener('mousedown', function (e) {
         this.dragAndDrop(e);
-
     }.bind(this));
 
     this.tableBody.addEventListener('mousemove', function (e) {
@@ -328,7 +325,6 @@ TableEditor.prototype.dragAndDrop = function (e) {
     }
 
     this.dragObject = this.getDraggedRow(e);
-    this.dragObject.downX = e.pageX;
     this.dragObject.downY = e.pageY;
 };
 
@@ -368,6 +364,7 @@ TableEditor.prototype.dragAndDropFinish = function () {
         this.dragObject.style.opacity  = 1;
         this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo);
     }
+    // this.tData.splice(this.tData[1], 1, this.tData[2]);
     this.dragHoverHandler();
     this.dragObject = '';
     this.dragTo = '';

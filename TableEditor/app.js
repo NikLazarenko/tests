@@ -344,6 +344,7 @@ TableEditor.prototype.dragAndDrop = function (e) {
 
     this.dragObject = this.getDraggedRow(e);
     this.dragObject.downY = e.pageY;
+    this.dragObject.dragFromId = this.dragObject.getAttribute('data-id') - 1;
 };
 
 TableEditor.prototype.dragHoverHandler = function () {
@@ -376,13 +377,14 @@ TableEditor.prototype.dragAndDropMoving = function (e) {
 
 TableEditor.prototype.dragAndDropFinish = function () {
     if (this.dragTo.length !== 0) {
+        this.dragObject.dragToId = this.dragTo.getAttribute('data-id') - 1;
         this.dragObject.style.top = this.dragObject.downY;
         this.dragObject.style.position = 'relative';
         this.dragObject.style.pointerEvents = 'auto';
         this.dragObject.style.opacity  = 1;
         this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo);
     }
-    // this.tData.splice(this.tData[1], 1, this.tData[2]);
+    this.tData.move(this.dragObject.dragFromId, this.dragObject.dragToId);
     this.dragHoverHandler();
     this.dragObject = '';
     this.dragTo = '';
@@ -396,6 +398,10 @@ TableEditor.prototype.getDraggedRow = function (e) {
         }
         row = row.parentNode;
     }
+};
+
+Array.prototype.move = function(from, to) {
+    this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
 document.addEventListener("DOMContentLoaded", function () {

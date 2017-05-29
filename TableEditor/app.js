@@ -8,64 +8,53 @@ function TableEditor(container, cntRowOnPage) {
 TableEditor.prototype.init = function () {
     this.table = this.tableEditorContainer.querySelector('.table');
     this.tableBody = this.table.getElementsByTagName('tbody')[0];
-    this.addRowForm = this.tableEditorContainer.querySelectorAll('.add-row-form');
-    this.dataForm = this.tableEditorContainer.querySelector('.data-form');
-
-    this.showAddFormBtn = this.tableEditorContainer.querySelector('.btn-show-add-form');
-    this.showExportTableBtn = this.tableEditorContainer.querySelector('.btn-export');
-    this.demoDataBtn = this.tableEditorContainer.querySelectorAll('.btn-demo-data');
-    this.insertRowBtn = this.tableEditorContainer.querySelectorAll('.add-row-btn');
-    this.deleteRowBtn = this.tableEditorContainer.querySelectorAll('.btn-delete-row');
-    this.clearTableBtn = this.tableEditorContainer.querySelectorAll('.btn-clear-table');
-    this.btnImportData = this.tableEditorContainer.querySelector('.btn-import-data');
-    this.btnExportData = this.tableEditorContainer.querySelector('.btn-export-data');
-    this.paginationPanel = this.tableEditorContainer.querySelector('.pagination');
+    this.addRowForm = this.tableEditorContainer.querySelector('.js-add-row-form');
+    this.dataForm = this.tableEditorContainer.querySelector('.js-data-form');
+    this.paginationPanel = this.tableEditorContainer.querySelector('.js-pagination');
     this.paginationLink = this.paginationPanel.getElementsByTagName('a');
     this.tableSorting = this.table.querySelector('thead');
 
-    this.nameField = this.tableEditorContainer.querySelector('.table-editor-name');
-    this.qtyField = this.tableEditorContainer.querySelector('.table-editor-qty');
-    this.availability = this.tableEditorContainer.querySelector('.availability-checkbox');
-    this.dataField = this.tableEditorContainer.querySelector('.data-field');
-    this.filterField = this.tableEditorContainer.querySelector('.filter-name');
+    this.nameField = this.tableEditorContainer.querySelector('.js-table-editor-name');
+    this.qtyField = this.tableEditorContainer.querySelector('.js-table-editor-qty');
+    this.availability = this.tableEditorContainer.querySelector('.js-availability-checkbox');
+    this.dataField = this.tableEditorContainer.querySelector('.js-data-field');
+    this.filterField = this.tableEditorContainer.querySelector('.js-filter-name');
     this.tData = [];
     this.sortedColumn = '';
     this.currentPageNumber = 0;
     this.dragObject = '';
-    this.helperDrag = '';
     this.dragTo = '';
 
     this.events();
 };
 
 TableEditor.prototype.events = function () {
-    this.showAddFormBtn.addEventListener('click', function () {
-        this.show(this.addRowForm[0]);
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-show-add-form', function () {
+        this.toggleNodeVisibility(this.addRowForm);
+    }.bind(this));
+    this.tableEditorContainer.querySelector('.js-add-row-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        this.insertNewRow();
     }.bind(this));
 
-    for (var i = 0; i < this.insertRowBtn.length; i++) {
-        this.insertRowBtn[i].addEventListener('click', this.insertNewRow.bind(this));
-    }
-
-    for (var i = 0; i < this.demoDataBtn.length; i++) {
-        this.demoDataBtn[i].addEventListener('click', this.generateRandomData.bind(this));
-    }
-
-    for (var i = 0; i < this.deleteRowBtn.length; i++) {
-        this.deleteRowBtn[i].addEventListener('click', this.deleteRows.bind(this));
-    }
-
-    for (var i = 0; i < this.clearTableBtn.length; i++) {
-        this.clearTableBtn[i].addEventListener('click', this.clearTable.bind(this));
-    }
-
-    this.showExportTableBtn.addEventListener('click', function () {
-        this.show(this.dataForm);
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', function () {
+        this.generateRandomData();
     }.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-clear-table', this.clearTable.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-export-data', function () {
+        this.toggleNodeVisibility(this.dataForm);
+        this.exportDataToJSON();
+    }.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-import-data', this.importDataFromJSON.bind(this));
 
-    this.btnImportData.addEventListener('click', this.importDataToJSON.bind(this));
-    this.btnExportData.addEventListener('click', this.exportDataFromJSON.bind(this));
     this.filterField.addEventListener('keyup', this.filterByName.bind(this));
+
+    this.filterField.addEventListener('keypress', function (e) {
+        this.disableSubmitting(e);
+    }.bind(this));
+
     this.paginationPanel.addEventListener('click', this.paginationHandler.bind(this));
     this.tableSorting.addEventListener('click', this.sorting.bind(this));
 
@@ -81,8 +70,8 @@ TableEditor.prototype.events = function () {
     this.tableBody.addEventListener('mouseup', this.dragAndDropFinish.bind(this));
 };
 
-TableEditor.prototype.show = function (block) {
-    block.classList.toggle('hidden');
+TableEditor.prototype.toggleNodeVisibility = function (node) {
+    node.classList.toggle('hidden');
 };
 
 TableEditor.prototype.drawRow = function (data) {
@@ -109,6 +98,7 @@ TableEditor.prototype.insertNewRow = function () {
     this.drawRow(this.tData);
     this.filterByName();
     this.renderPaginationPanel();
+    this.saveSorting();
 };
 
 TableEditor.prototype.generateRandomData = function () {
@@ -125,6 +115,7 @@ TableEditor.prototype.generateRandomData = function () {
     this.drawRow(this.tData);
     this.filterByName();
     this.renderPaginationPanel();
+    this.saveSorting();
 };
 
 TableEditor.prototype.getRandomNum = function (min, max) {
@@ -146,7 +137,7 @@ TableEditor.prototype.getRandomStr = function () {
 
 TableEditor.prototype.deleteRows = function () {
     this.deleteCheckbox = this.tableBody.querySelectorAll('.delete-checkbox:checked');
-    if (this.deleteCheckbox.length !== 0) {
+    if (this.deleteCheckbox.length) {
         for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
             var checkedRowId = this.deleteCheckbox[i].value;
             this.tData.splice(checkedRowId - 1, 1);
@@ -154,6 +145,7 @@ TableEditor.prototype.deleteRows = function () {
         this.updateIds();
         this.filterByName();
         this.renderPaginationPanel();
+        this.saveSorting();
     }
 };
 
@@ -170,11 +162,11 @@ TableEditor.prototype.clearTable = function () {
     this.paginationPanel.innerHTML = '';
 };
 
-TableEditor.prototype.importDataToJSON = function () {
+TableEditor.prototype.exportDataToJSON = function () {
     this.dataField.value = JSON.stringify(this.tData);
 };
 
-TableEditor.prototype.exportDataFromJSON = function () {
+TableEditor.prototype.importDataFromJSON = function () {
     try {
         var jsonData = JSON.parse(this.dataField.value);
         for (var i = 0; i < jsonData.length; i++) {
@@ -184,13 +176,14 @@ TableEditor.prototype.exportDataFromJSON = function () {
         this.updateIds();
         this.filterByName();
         this.renderPaginationPanel();
+        this.saveSorting();
     } catch (err) {
         throw new Error('Error, please check your input JSON data ' + err);
     }
 };
 
 TableEditor.prototype.filterByName = function () {
-    if (this.filterField.length !== 0 && this.tData.length !== 0) {
+    if (this.filterField.length !== 0 && this.tData.length) {
         var currentPageData = this.generatePageData()[this.currentPageNumber];
         var result = currentPageData.filter(function (arr, i) {
             return currentPageData[i].name.indexOf(this.filterField.value) + 1;
@@ -238,19 +231,15 @@ TableEditor.prototype.sorting = function (e) {
     e.preventDefault();
     var columnName = this.getSortingColumn(e);
     if (columnName) {
-        if (this.sortedColumn === columnName) {
-            this.tData.reverse();
-            this.drawRow(this.tData);
+        var columnProperty = columnName.getAttribute('data-column');
+        if (columnName.classList.contains('ascending-sort')) {
+            this.sortItemsDescending(columnProperty);
 
-            columnName.classList.toggle('descending-sort');
-            columnName.classList.toggle('ascending-sort');
+            columnName.classList.add('descending-sort');
+            columnName.classList.remove('ascending-sort');
         } else {
             this.defaultArrowsView();
-            var columnProperty = columnName.getAttribute('data-column');
-            var compare = function (a, b) {
-                return a[columnProperty] > b[columnProperty]  ? 1 : -1;
-            };
-            this.tData.sort(compare);
+            this.sortItemsAscending(columnProperty);
 
             columnName.classList.remove('descending-sort');
             columnName.classList.add('ascending-sort');
@@ -261,8 +250,35 @@ TableEditor.prototype.sorting = function (e) {
     }
 };
 
+TableEditor.prototype.sortItemsAscending = function (columnProp) {
+    var compare = function (a, b) {
+        return a[columnProp] > b[columnProp]  ? 1 : -1;
+    };
+    this.tData = this.tData.sort(compare);
+};
+
+TableEditor.prototype.sortItemsDescending = function (columnProp) {
+    var compare = function (a, b) {
+        return a[columnProp] < b[columnProp]  ? 1 : -1;
+    };
+    this.tData = this.tData.sort(compare);
+};
+
+TableEditor.prototype.saveSorting = function () {
+    if (this.sortedColumn.length !== 0) {
+        var sortedColumn = this.sortedColumn.getAttribute('data-column');
+        if (this.sortedColumn.classList.contains('ascending-sort')) {
+            this.sortItemsAscending(sortedColumn);
+        } else {
+            this.sortItemsDescending(sortedColumn);
+        }
+        this.drawRow(this.tData);
+    }
+    this.renderPaginationPanel();
+};
+
 TableEditor.prototype.defaultArrowsView = function () {
-    var sortingButtons = this.tableSorting.querySelectorAll('.sort-arrow');
+    var sortingButtons = this.tableSorting.querySelectorAll('.js-sort-arrow');
     for (var i = 0; i < sortingButtons.length; i++) {
         sortingButtons[i].classList.remove('ascending-sort', 'descending-sort');
     }
@@ -271,10 +287,38 @@ TableEditor.prototype.defaultArrowsView = function () {
 TableEditor.prototype.getSortingColumn = function (e) {
     var columnType = e.target;
     while (columnType !== this.tableSorting) {
-        if (columnType.classList.contains('sort-arrow')) {
+        if (columnType.classList.contains('js-sort-arrow')) {
             return columnType;
         }
         columnType = columnType.parentNode;
+    }
+};
+
+TableEditor.prototype.getTarget = function (e, className) {
+    var target = e.target;
+    while (target !== this.tableEditorContainer) {
+        if (target.classList.contains(className)) {
+            return target;
+        }
+        target = target.parentNode;
+    }
+};
+
+TableEditor.prototype.addEvent = function (parentNode, listener, selector, method) {
+    var func = function (e) {
+        if (this.getTarget(e, selector)) {
+            method();
+        }
+    }.bind(this);
+
+    parentNode.addEventListener(listener, func);
+};
+
+TableEditor.prototype.disableSubmitting = function (e) {
+    var code = e.keyCode || e.which;
+    if (code === 13) {
+        e.preventDefault();
+        return false;
     }
 };
 

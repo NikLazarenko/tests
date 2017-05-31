@@ -43,10 +43,6 @@
     overflow: hidden;
 }
 
-.table-striped>tbody>tr:nth-of-type(even) {
-    background-color: #fff;
-}
-
 .table tr {
     width: 100%;
 }

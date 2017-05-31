@@ -39,7 +39,6 @@ TableEditor.prototype.events = function () {
 
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', this.generateRandomData.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
-    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-clear-table', this.clearTable.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-export-data', function () {
         this.toggleNodeVisibility(this.dataForm);
@@ -84,7 +83,7 @@ TableEditor.prototype.drawRow = function (data) {
             '<td contenteditable="true" data-prop="name">'+ newRow.name + '</td>' +
             '<td contenteditable="true" data-prop="qty" class="js-num-validation">'+ newRow.qty + '</td>' +
             '<td>'+ newRow.availability + '</td>' +
-            '<td><input type="checkbox" class="delete-checkbox" value="'+ newRow.id +'"></td>' +
+            '<td><input type="checkbox" class="delete-checkbox"></td>' +
             '</tr>';
     }.bind(this)).join('');
 };
@@ -154,7 +153,7 @@ TableEditor.prototype.deleteRows = function () {
     this.deleteCheckbox = this.tableBody.querySelectorAll('.delete-checkbox:checked');
     if (this.deleteCheckbox.length) {
         for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
-            var checkedRowId = this.deleteCheckbox[i].value;
+            var checkedRowId = this.deleteCheckbox[i].parentNode.parentNode.getAttribute('data-id');
             this.tData.splice(checkedRowId - 1, 1);
         }
         this.updateIds();
@@ -382,12 +381,24 @@ TableEditor.prototype.dragAndDropFinish = function () {
         this.dragObject.style.position = 'relative';
         this.dragObject.style.pointerEvents = 'auto';
         this.dragObject.style.opacity  = 1;
-        this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo);
+        if (this.dragObject.rowIndex > this.dragTo.rowIndex) {
+            this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo);
+        } else {
+            this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo.nextSibling);
+        }
+        this.tData.move(this.dragObject.dragFromId, this.dragObject.dragToId);
+        this.updateRowId();
+        this.defaultArrowsView();
     }
-    this.tData.move(this.dragObject.dragFromId, this.dragObject.dragToId);
     this.dragHoverHandler();
     this.dragObject = '';
     this.dragTo = '';
+};
+
+TableEditor.prototype.updateRowId = function () {
+    for (var i = 0; i < this.tableBody.childNodes.length; i++) {
+        this.tableBody.childNodes[i].setAttribute('data-id', i + 1);
+    }
 };
 
 TableEditor.prototype.getDraggedRow = function (e) {

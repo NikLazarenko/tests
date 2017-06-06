@@ -22,6 +22,8 @@ TableEditor.prototype.init = function () {
     this.tData = [];
     this.sortedColumn = '';
     this.currentPageNumber = 0;
+    this.dragObject = '';
+    this.dragTo = '';
 
     this.events();
 };
@@ -35,10 +37,7 @@ TableEditor.prototype.events = function () {
         this.insertNewRow();
     }.bind(this));
 
-    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', function () {
-        this.generateRandomData();
-    }.bind(this));
-    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
+    this.addEvent(this.tableEditorContainer, 'click', 'js-btn-demo-data', this.generateRandomData.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-delete-row', this.deleteRows.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-clear-table', this.clearTable.bind(this));
     this.addEvent(this.tableEditorContainer, 'click', 'js-btn-export-data', function () {
@@ -55,6 +54,22 @@ TableEditor.prototype.events = function () {
 
     this.paginationPanel.addEventListener('click', this.paginationHandler.bind(this));
     this.tableSorting.addEventListener('click', this.sorting.bind(this));
+
+    this.tableBody.addEventListener('input', function () {
+        this.editableContent(event);
+    }.bind(this));
+
+    this.addEvent(this.tableEditorContainer, 'keypress', 'js-num-validation', this.validateNumbers.bind(this));
+
+    this.tableBody.addEventListener('mousedown', function (e) {
+        this.dragAndDrop(e);
+    }.bind(this));
+
+    this.tableBody.addEventListener('mousemove', function (e) {
+        this.dragAndDropMoving(e);
+    }.bind(this));
+
+    this.tableBody.addEventListener('mouseup', this.dragAndDropFinish.bind(this));
 };
 
 TableEditor.prototype.toggleNodeVisibility = function (node) {
@@ -63,14 +78,26 @@ TableEditor.prototype.toggleNodeVisibility = function (node) {
 
 TableEditor.prototype.drawRow = function (data) {
     this.tableBody.innerHTML = data.map(function (newRow) {
-        return '<tr>' +
-            '<td>'+ newRow.id + '</td>' +
-            '<td>'+ newRow.name + '</td>' +
-            '<td>'+ newRow.qty + '</td>' +
+        return '<tr data-id="'+ newRow.id +'">' +
+            '<td class="js-row-id">'+ newRow.id + '</td>' +
+            '<td contenteditable="true" data-prop="name">'+ newRow.name + '</td>' +
+            '<td contenteditable="true" data-prop="qty" class="js-num-validation">'+ newRow.qty + '</td>' +
             '<td>'+ newRow.availability + '</td>' +
-            '<td><input type="checkbox" class="delete-checkbox" value="'+ newRow.id +'"></td>' +
+            '<td><input type="checkbox" class="delete-checkbox"></td>' +
             '</tr>';
     }.bind(this)).join('');
+};
+
+TableEditor.prototype.editableContent = function () {
+    var target = event.target;
+    var editableRow = target.parentNode.getAttribute('data-id');
+    this.tData[editableRow - 1][target.getAttribute('data-prop')] = target.innerHTML;
+};
+
+TableEditor.prototype.validateNumbers = function () {
+    if (!(event.charCode >= 48 && event.charCode <= 57)) {
+        event.preventDefault();
+    }
 };
 
 TableEditor.prototype.insertNewRow = function () {
@@ -126,7 +153,7 @@ TableEditor.prototype.deleteRows = function () {
     this.deleteCheckbox = this.tableBody.querySelectorAll('.delete-checkbox:checked');
     if (this.deleteCheckbox.length) {
         for (var i = this.deleteCheckbox.length - 1; i >= 0; i--) {
-            var checkedRowId = this.deleteCheckbox[i].value;
+            var checkedRowId = this.deleteCheckbox[i].parentNode.parentNode.getAttribute('data-id');
             this.tData.splice(checkedRowId - 1, 1);
         }
         this.updateIds();
@@ -228,6 +255,7 @@ TableEditor.prototype.sorting = function (e) {
             this.defaultArrowsView();
             this.sortItemsAscending(columnProperty);
 
+            columnName.classList.remove('descending-sort');
             columnName.classList.add('ascending-sort');
             this.sortedColumn = this.getSortingColumn(e);
         }
@@ -306,6 +334,85 @@ TableEditor.prototype.disableSubmitting = function (e) {
         e.preventDefault();
         return false;
     }
+};
+
+TableEditor.prototype.dragAndDrop = function (e) {
+    if (e.which !== 1) {
+        return;
+    }
+
+    this.dragObject = this.getDraggedRow(e);
+    this.dragObject.downY = e.pageY;
+    this.dragObject.dragFromId = this.dragObject.getAttribute('data-id') - 1;
+};
+
+TableEditor.prototype.dragHoverHandler = function () {
+    var rows = this.dragObject.parentNode.childNodes;
+    for (var i = 0; i < rows.length; i++) {
+        rows[i].style.backgroundColor = '';
+    }
+};
+
+TableEditor.prototype.dragAndDropMoving = function (e) {
+    if (!this.dragObject) return;
+
+    var moveY = e.pageY - this.dragObject.downY;
+
+    if (Math.abs(moveY) > 3) {
+        this.dragObject.style.position = 'absolute';
+        this.dragObject.style.pointerEvents  = 'none';
+        this.dragObject.style.opacity  = .5;
+
+        var offset = this.tableBody.getBoundingClientRect().top;
+        this.dragObject.style.top = e.pageY - offset + 'px';
+        var draggedRow = this.getDraggedRow(e);
+        if (this.dragTo !== draggedRow) {
+            this.dragHoverHandler();
+        }
+        this.dragTo = draggedRow;
+        this.dragTo.style.backgroundColor = '#a6a6a6';
+    }
+};
+
+TableEditor.prototype.dragAndDropFinish = function () {
+    if (this.dragTo.length !== 0) {
+        this.dragObject.dragToId = this.dragTo.getAttribute('data-id') - 1;
+        this.dragObject.style.top = this.dragObject.downY;
+        this.dragObject.style.position = 'relative';
+        this.dragObject.style.pointerEvents = 'auto';
+        this.dragObject.style.opacity  = 1;
+        if (this.dragObject.rowIndex > this.dragTo.rowIndex) {
+            this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo);
+        } else {
+            this.dragObject.parentNode.insertBefore(this.dragObject, this.dragTo.nextSibling);
+        }
+        this.tData.move(this.dragObject.dragFromId, this.dragObject.dragToId);
+        this.updateRowId();
+        this.defaultArrowsView();
+    }
+    this.dragHoverHandler();
+    this.dragObject = '';
+    this.dragTo = '';
+};
+
+TableEditor.prototype.updateRowId = function () {
+    for (var i = 0; i < this.tableBody.childNodes.length; i++) {
+        this.tableBody.childNodes[i].setAttribute('data-id', i + 1);
+    }
+};
+
+TableEditor.prototype.getDraggedRow = function (e) {
+    var row = e.target;
+    while (row !== this.tableBody) {
+        if (row.tagName === 'TR') {
+            return row;
+        }
+        row = row.parentNode;
+    }
+};
+
+Array.prototype.move = function(from, to) {
+    this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
 document.addEventListener("DOMContentLoaded", function () {
